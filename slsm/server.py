@@ -27,7 +27,12 @@ def create_app(storage_path):
 
     @app.route('/')
     def index():
-        return render_template('index.html')
+        import socket
+        try:
+            lan_ip = socket.gethostbyname(socket.gethostname())
+        except:
+            lan_ip = "127.0.0.1"
+        return render_template('index.html', lan_ip=lan_ip)
 
     @app.route('/manifest.json')
     def get_manifest():
@@ -39,7 +44,11 @@ def create_app(storage_path):
             "idPrefixes": ["tt"],
             "resources": ["subtitles"],
             "types": ["movie", "series"],
-            "catalogs": []
+            "catalogs": [],
+            "behaviorHints": {
+                "configurable": True,
+                "configurationRequired": True
+            }
         }
         return jsonify(manifest)
 

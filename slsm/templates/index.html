@@ -11,7 +11,11 @@
     <nav class="navbar navbar-dark bg-dark mb-4 shadow">
         <div class="container d-flex justify-content-between">
             <span class="navbar-brand mb-0 h1" data-i18n="navBrand">🎬 SLS Manager Admin</span>
-            <span class="navbar-text">
+            <span class="navbar-text d-flex align-items-center">
+                <div class="input-group input-group-sm me-3" style="width: 200px;">
+                    <span class="input-group-text bg-dark text-light border-secondary">IP/Host</span>
+                    <input type="text" id="custom-host" class="form-control bg-dark text-info border-secondary" value="{{ lan_ip }}:3001" oninput="updateInstallLink()">
+                </div>
                 <a href="#" id="install-link" class="btn btn-outline-info btn-sm text-decoration-none me-3" data-i18n="btnInstall">Instalar Add-on (stremio://)</a>
                 <button class="btn btn-sm btn-outline-light" onclick="switchLang('pt')">🇧🇷 PT</button>
                 <button class="btn btn-sm btn-outline-light" onclick="switchLang('en')">🇺🇸 EN</button>
@@ -382,9 +386,14 @@
             }
         }
 
+        function updateInstallLink() {
+            const hostVal = document.getElementById('custom-host').value.trim() || window.location.host;
+            document.getElementById('install-link').href = 'stremio://' + hostVal + '/manifest.json';
+        }
+
         // Auto-Carregar
         document.addEventListener('DOMContentLoaded', () => {
-             document.getElementById('install-link').href = 'stremio://' + window.location.host + '/manifest.json';
+             updateInstallLink();
              applyLang();
              fetchStaged();
              fetchDirectories();
