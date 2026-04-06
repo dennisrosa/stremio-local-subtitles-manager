@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLSM - Stremio Local Subtitles Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark mb-4 shadow">
+        <div class="container d-flex justify-content-between">
+            <span class="navbar-brand mb-0 h1" data-i18n="navBrand">🎬 SLS Manager Admin</span>
+            <span class="navbar-text">
+                <a href="stremio://localhost:3001/manifest.json" class="btn btn-outline-info btn-sm text-decoration-none me-3" data-i18n="btnInstall">Instalar Add-on (stremio://)</a>
+                <button class="btn btn-sm btn-outline-light" onclick="switchLang('pt')">🇧🇷 PT</button>
+                <button class="btn btn-sm btn-outline-light" onclick="switchLang('en')">🇺🇸 EN</button>
+            </span>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0" data-i18n="stagingTitle">Área de Staging (Demandas Pendentes)</h5>
+                <div>
+                    <button class="btn btn-light btn-sm me-2" onclick="fetchStaged()" data-i18n="btnRefresh">🔄 Atualizar</button>
+                    <button class="btn btn-success btn-sm me-2" onclick="authorizeAll()" data-i18n="btnAuthAll">📥 Aprovar Todas</button>
+                    <button class="btn btn-danger btn-sm" onclick="clearQueue()" data-i18n="btnClearQueue">🗑️ Limpar Fila</button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="px-3" data-i18n="colMedia">Mídia</th>
+                                <th data-i18n="colSeason">Temporada/Ep.</th>
+                                <th data-i18n="colRelease">Release / "Extra"</th>
+                                <th data-i18n="colLoc">Localização Estrutural</th>
+                                <th class="px-3" style="width: 180px;" data-i18n="colActions">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staging-table-body">
+                            <tr><td colspan="5" class="text-center text-muted py-4" data-i18n="loadingStaging">Atualizando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between">
+                <h5 class="mb-0" data-i18n="repoTitle">📁 Repositório de Diretórios & Upload Local</h5>
+                <button class="btn btn-sm btn-outline-light" onclick="fetchDirectories()" data-i18n="btnRefreshGrid">🔄 Atualizar Grid</button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="px-3 text-center" style="width: 70px;" data-i18n="colPoster">Pôster</th>
+                                <th data-i18n="colTitle">Título (Cinemeta API)</th>
+                                <th data-i18n="colMediaRepo">Mídia</th>
+                                <th class="px-3" data-i18n="colSubs">Legendas Hospedadas</th>
+                                <th class="px-3 text-end" style="width: 150px;" data-i18n="colUpload">Upload & Gestão</th>
+                            </tr>
+                        </thead>
+                        <tbody id="repo-table-body">
+                            <tr><td colspan="5" class="text-center text-muted py-4" data-i18n="loadRepo">Aguarde... Montando grade de diretórios.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const i18n = {
+            pt: {
+                navBrand: "🎬 SLSM - Stremio Local Subtitles Manager",
+                btnInstall: "Instalar Add-on (stremio://)",
+                stagingTitle: "Área de Staging (Demandas Pendentes)",
+                btnRefresh: "🔄 Atualizar",
+                btnAuthAll: "📥 Aprovar Todas",
+                btnClearQueue: "🗑️ Limpar Fila",
+                colMedia: "Mídia",
+                colSeason: "Temporada/Ep.",
+                colRelease: "Release / \"Extra\"",
+                colLoc: "Localização Estrutural",
+                colActions: "Ações",
+                loadingStaging: "Atualizando...",
+                emptyStaging: "✨ Nenhuma mídia ausente requisitada pelo Stremio na fila temporal.",
+                errApi: "Erro ao se conectar com a API Backend.",
+                confirmClear: "Esvaziar permanentemente toda a fila pendente?",
+                errClear: "Erro ao limpar a fila do staging.",
+                btnApprove: "Aprovar Pasta",
+                titleApproved: "Autorizar construção das pastas físicas",
+                repoTitle: "📁 Repositório de Diretórios & Upload Local",
+                btnRefreshGrid: "🔄 Atualizar Grid",
+                colPoster: "Pôster",
+                colTitle: "Título (Cinemeta API)",
+                colMediaRepo: "Mídia",
+                colSubs: "Legendas Hospedadas",
+                colUpload: "Upload Inline",
+                loadRepo: "Aguarde... Montando grade de diretórios.",
+                emptyRepo: "Nenhuma pasta autorizada/criada ainda no servidor local.",
+                imdbLocating: "⌛ Localizando IMDB...",
+                btnUpload: "📤",
+                btnUploadWait: "⏳",
+                titleUnknown: "Não Mapeado na Cinemeta",
+                titleErr: "Erro na Cinemeta API",
+                confirmAuthAll: "Gerar definitivamente pastas físicas para TODAS as pendências listadas?",
+                failConnection: "Falha de conexão.",
+                badRequest: "⚠️ Erro da Aplicação no upload:\n\n",
+                noneEmpty: "Nenhum Arquivo",
+                badgeMovie: "FILME",
+                badgeSerie: "SÉRIE",
+                confirmDelDir: "Você vai EXCLUIR definitivamente essa pasta física de mídia da máquina junto com todas as legendas integradas. Confirmar?",
+                errDelDir: "Falha ao deletar. Permissão negada pelo Windows ou diretório não existe.",
+                colUpload: "Upload & Gestão"
+            },
+            en: {
+                navBrand: "🎬 SLSM - Stremio Local Subtitles Manager",
+                btnInstall: "Install Add-on (stremio://)",
+                stagingTitle: "Staging Area (Pending Requests)",
+                btnRefresh: "🔄 Refresh",
+                btnAuthAll: "📥 Approve All",
+                btnClearQueue: "🗑️ Clear Queue",
+                colMedia: "Media",
+                colSeason: "Season/Ep.",
+                colRelease: "Release / \"Extra\"",
+                colLoc: "Target Dir",
+                colActions: "Actions",
+                loadingStaging: "Refreshing...",
+                emptyStaging: "✨ No missing media requested by Stremio in the queue.",
+                errApi: "Error connecting to the Backend API.",
+                confirmClear: "Permanently empty the entire pending queue?",
+                errClear: "Error clearing staging queue.",
+                btnApprove: "Approve Dir",
+                titleApproved: "Authorize physical folder creation",
+                repoTitle: "📁 Directory Repository & Local Upload",
+                btnRefreshGrid: "🔄 Refresh Grid",
+                colPoster: "Poster",
+                colTitle: "Title (Cinemeta API)",
+                colMediaRepo: "Media",
+                colSubs: "Hosted Subtitles",
+                colUpload: "Inline Upload",
+                loadRepo: "Please wait... Building directory grid.",
+                emptyRepo: "No authorized/created local folders yet.",
+                imdbLocating: "⌛ Locating IMDB...",
+                btnUpload: "📤",
+                btnUploadWait: "⏳",
+                titleUnknown: "Not Mapped in Cinemeta",
+                titleErr: "Cinemeta API Error",
+                confirmAuthAll: "Generate physical folders for ALL pending requests?",
+                failConnection: "Connection failed.",
+                badRequest: "⚠️ Application Upload Error:\n\n",
+                noneEmpty: "No Files",
+                badgeMovie: "MOVIE",
+                badgeSerie: "SERIE",
+                confirmDelDir: "Permanently DELETE this physical media folder and all its subtitles from the hard-drive. Are you sure?",
+                errDelDir: "Failed to delete. Permission denied or folder missing.",
+                colUpload: "Upload & Manage"
+            }
+        };
+
+        let currentLang = localStorage.getItem('sls_lang') || 'pt';
+        
+        function t(key) {
+            return i18n[currentLang][key] || key;
+        }
+
+        function applyLang() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.innerHTML = i18n[currentLang][key];
+                }
+            });
+        }
+
+        function switchLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('sls_lang', lang);
+            applyLang();
+            fetchStaged();
+            fetchDirectories();
+        }
+
+        const langFlags = {
+            "por": "🇧🇷 PT",
+            "eng": "🇺🇸 EN",
+            "spa": "🇪🇸 ES",
+            "fre": "🇫🇷 FR"
+        };
+
+        async function fetchStaged() {
+            const tbody = document.getElementById('staging-table-body');
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">${t('loadingStaging')}</td></tr>`;
+            try {
+                const response = await fetch('/staged');
+                const data = await response.json();
+                tbody.innerHTML = '';
+                
+                if(!data.pending || data.pending.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">${t('emptyStaging')}</td></tr>`;
+                    return;
+                }
+
+                data.pending.forEach(req => {
+                    const extra = req.extra_info || {};
+                    const filename = extra.filename || '-';
+                    const videoHash = extra.videoHash ? `(Hash: ${extra.videoHash})` : '';
+                    
+                    const isSeries = req.type === 'series';
+                    const sEp = isSeries ? `S${String(req.season).padStart(2,'0')}E${String(req.episode).padStart(2,'0')}` : t('badgeMovie');
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-3">
+                            <span class="badge bg-${isSeries ? 'info text-dark' : 'secondary text-white'} mb-1">${isSeries ? t('badgeSerie') : t('badgeMovie')}</span><br>
+                            <strong>${req.media_id}</strong>
+                        </td>
+                        <td>${sEp}</td>
+                        <td style="max-width: 280px;">
+                            <div class="text-truncate fw-medium" title="${filename}">${filename}</div>
+                            <small class="text-muted d-block text-truncate" title="${videoHash}">${videoHash}</small>
+                        </td>
+                        <td>
+                            <code class="text-secondary small">${req.target_dir}</code>
+                        </td>
+                        <td class="px-3">
+                            <button class="btn btn-success btn-sm w-100 mb-1" onclick="authorizeReq('${req.id}')" title="${t('titleApproved')}">${t('btnApprove')}</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch(e) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">${t('errApi')}</td></tr>`;
+            }
+        }
+
+        async function clearQueue() {
+            if(!confirm(t('confirmClear'))) return;
+            try {
+                await fetch('/staged/all', { method: 'DELETE' });
+                fetchStaged();
+            } catch(e) {
+                alert(t('errClear'));
+            }
+        }
+
+        async function fetchDirectories() {
+            const tbody = document.getElementById('repo-table-body');
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">${t('loadRepo')}</td></tr>`;
+            try {
+                const response = await fetch('/directories');
+                const data = await response.json();
+                tbody.innerHTML = '';
+                
+                if(!data.directories || data.directories.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">${t('emptyRepo')}</td></tr>`;
+                    return;
+                }
+
+                for(const d of data.directories) {
+                    const tr = document.createElement('tr');
+                    const isSeries = d.type === 'serie';
+                    const epStr = isSeries && d.season ? `<br><small class="text-muted fw-bold">S${d.season} - E${d.episode}</small>` : '';
+                    
+                    const safeId = d.path.replace(/[^a-zA-Z0-9]/g, '-');
+                    
+                    let subsHtml = d.subtitles.length === 0 
+                        ? `<span class="badge bg-warning text-dark">${t('noneEmpty')}</span>`
+                        : d.subtitles.map(s => `<span class="badge bg-primary mb-1 me-1" title="${s.filename}">${langFlags[s.lang] || '🌐 '+s.lang.toUpperCase()}</span>`).join('');
+
+                    tr.innerHTML = `
+                        <td class="px-3 text-center">
+                            <img src="" id="img-${safeId}" style="width:40px; height:60px; object-fit: cover; border-radius: 4px; background: #ddd; display:none;">
+                            <div id="ph-${safeId}" style="width:40px; height:60px; border-radius: 4px; background: #eee; border: 1px dashed #ccc; font-size:10px; display:flex; align-items:center; justify-content:center; color:#888;">N/A</div>
+                        </td>
+                        <td>
+                            <strong id="title-${safeId}">${t('imdbLocating')}</strong>
+                            <div class="text-muted small">${d.media_id}</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-${isSeries ? 'info text-dark' : 'secondary text-white'} mb-1">${isSeries ? t('badgeSerie') : t('badgeMovie')}</span>
+                            ${epStr}
+                        </td>
+                        <td><div class="d-flex flex-wrap">${subsHtml}</div></td>
+                        <td class="px-3">
+                            <div class="d-flex justify-content-end align-items-center">
+                                <button class="btn btn-sm btn-success me-2 px-3 py-1 fw-bold shadow-sm" onclick="triggerDirectUpload('${safeId}')" title="${t('btnUpload')}">${t('btnUpload')}</button>
+                                <input type="file" id="up-${safeId}" style="display:none;" accept=".srt,.vtt,.ass" onchange="performDirectUpload(event, '${d.path}')">
+                                <button class="btn btn-sm btn-outline-danger px-2 border-0" onclick="deleteDir('${d.path}')" title="Excluir Episódio">🗑️</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+
+                    // Cinemeta API fetch
+                    try {
+                        const typeMapped = d.type === 'serie' ? 'series' : 'movie';
+                        fetch(`https://v3-cinemeta.strem.io/meta/${typeMapped}/${d.media_id}.json`)
+                        .then(res => res.json())
+                        .then(cmData => {
+                            if(cmData && cmData.meta) {
+                                document.getElementById(`title-${safeId}`).innerText = cmData.meta.name || "N/A";
+                                if(cmData.meta.poster) {
+                                    document.getElementById(`img-${safeId}`).src = cmData.meta.poster;
+                                    document.getElementById(`img-${safeId}`).style.display = "block";
+                                    document.getElementById(`ph-${safeId}`).style.display = "none";
+                                }
+                            } else { document.getElementById(`title-${safeId}`).innerText = t('titleUnknown'); }
+                        }).catch(e => {
+                            document.getElementById(`title-${safeId}`).innerText = t('titleErr');
+                        });
+                    } catch(e){}
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function authorizeReq(id) {
+            try {
+                await fetch('/authorize/' + id, {method: 'POST'});
+                fetchStaged();
+                fetchDirectories();
+            } catch(e) { console.error(e); }
+        }
+
+        async function authorizeAll() {
+            if(!confirm(t('confirmAuthAll'))) return;
+            try {
+                await fetch('/authorize/all', {method: 'POST'});
+                fetchStaged();
+                fetchDirectories();
+            } catch(e) { console.error(e); }
+        }
+        
+        function triggerDirectUpload(safeId) {
+            document.getElementById(`up-${safeId}`).click();
+        }
+
+        async function performDirectUpload(e, targetRel) {
+            const fileInput = e.target;
+            if(!fileInput.files || !fileInput.files[0]) return;
+            
+            const btn = fileInput.previousElementSibling;
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = t('btnUploadWait');
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('target_dir', targetRel);
+            
+            try {
+                const res = await fetch('/upload', { method: 'POST', body: formData });
+                if(res.ok) {
+                    fetchDirectories();
+                } else {
+                    const js = await res.json();
+                    alert(t('badRequest') + js.error);
+                }
+            } catch(err) {
+                alert(t('failConnection'));
+            }
+            fileInput.value = ''; 
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }
+
+        async function deleteDir(targetRel) {
+            if(!confirm(t('confirmDelDir'))) return;
+            try {
+                const res = await fetch('/directory/' + targetRel, { method: 'DELETE' });
+                if(res.ok) fetchDirectories();
+                else alert(t('errDelDir'));
+            } catch(e) {
+                alert(t('failConnection'));
+            }
+        }
+
+        // Auto-Carregar
+        document.addEventListener('DOMContentLoaded', () => {
+             applyLang();
+             fetchStaged();
+             fetchDirectories();
+        });
+    </script>
+</body>
+</html>
