@@ -1,55 +1,56 @@
 <h1 align="center">🎬 SLSM - Stremio Local Subtitles Manager</h1>
 
 <p align="center">
-  <em>Um framework em Python (Flask) para gerenciamento passivo e submissão massiva de legendas locais em seu player Stremio, controladas numa Single Page Application robusta e multilinguagem.</em>
+  <em>A Python (Flask) framework for passive management and massive submission of local subtitles to your Stremio player, controlled through a robust, multi-language Single Page Application (SPA).</em>
 </p>
 
 ---
 
-## ⚡ O que o SLSM resolve?
-Você já passou raiva baixando legendas manuais que o Stremio não encontra oficialmente nas fontes externas, mas odeia a burocracia de criar arquivos e pastas com a nomenclatura que o Add-on pede no seu sistema de disco local C:/ ou D:/?
+## ⚡ What does SLSM solve?
+Have you ever been frustrated by having to download subtitles manually because Stremio couldn't find them on official external sources? Do you hate the bureaucracy of creating all those folders and naming files exactly as required by local Add-ons in your `C:/` or `D:/` drives?
 
-Nasceu o **Stremio Local Subtitles Manager (SLSM)**! Um addon que atua como um ouvinte local. Na requisição inicial o seu Stremio buscará a legenda para algum filme. Se não possuir, o App guarda o "pedido" pendente na memória (Staging Area). Você - Sysadmin da sua máquina - entra na área de gerência Web UI em qualquer navegador, e com **apenas 1 Clique** ("Autorizar Todas"), toda a estrutura hierárquica física vazia de Pastas (Movie ID / Seasons / Episodes) é automaticamente gerada e enraizada no HD. Depois, basta fazer os Uploads ali mesmo com um belo grid visual da Cinemeta API da sua própria casa!
+Meet the **Stremio Local Subtitles Manager (SLSM)**! This addon acts as a smart local listener. In the initial request, your Stremio will look for a movie or episode subtitle. If it doesn't have it locally, the App saves that "demand" in memory (Staging Area). You - the Sysadmin of your machine - can then access the Web UI from any browser, and with **just 1 Click** ("Approve All"), the entire empty physical logic and hierarchical folder structures (Movie ID / Seasons / Episodes) are automatically generated and rooted in your hard drive. After that, just upload the files directly using a beautiful UI grid that fetches movie data from the Cinemeta API!
 
-## ✨ Funcionalidades
-- **🎯 Smart Auto-Staging:** Capta os erros orgânicos da falta de legendas durante seu uso natural de TV/Stremio e documenta as carências para sua devida revisão e aprovação.
-- **📁 Gerência de Repositório Dinâmico:** Visualização limpa através do "Mega Grid Card", onde é filtrado séries por folhas de episódios poupando poluição. O Web Server busca Títulos e Posters interativos usando API oficial pública da Cinemeta.
-- **🌐 Suporte Nativo a Multi-Ideomas (i18n):** Todo o painel traduz instântaneamente (Client-Side Vanilla JS) p/ Português do Brasil (PT-BR) e Inglês Universal (EN) preservados no Cache! E auto-classificação internacional para as bandeiras de legenda (.eng, .per, .pt).
-- **🚀 Upload Inline Simplificado:** Sistema sem fricção para bater o mouse e empurrar direto do seu Windows Explorer à pasta almejada com validação robusta por trás!
+## ✨ Features
+- **🎯 Smart Auto-Staging:** Catches organic subtitle errors during your natural Stremio/TV usage and documents these requests for your review and approval.
+- **📁 Dynamic Repository Management:** Clean visualization through the "Mega Grid Card", which efficiently filters series into episode-level folders avoiding clutter. The Web Server fetches interactive Titles and Posters using the official public Cinemeta API.
+- **🌐 Native Multi-Language Support (i18n):** The entire dashboard translates instantly (Client-Side Vanilla JS) between English (EN) and Brazilian Portuguese (PT-BR) seamlessly, with settings cached! We also have an auto-classification feature for subtitle flags (.eng, .per, .pt).
+- **🚀 Simplified Inline Upload:** A frictionless system that allows you to click and push files directly from your Windows Explorer to the target folder with robust backend validation!
 
-## 📦 Instalação Fácil (CLI Daemon)
+## 📦 Easy Installation (CLI Daemon)
 
-O SLSM foi projetado como um módulo que acorda executáveis globais, injeta ele direto no Path:
-Ou instale diretamente do código do Git:
+SLSM was designed as a pip package module that registers a global executable straight to your Path.
+
+Install it directly from the Git source:
 ```bash
 git clone https://github.com/dennisrosa/stremio-local-subtitles-manager.git
 cd stremio-local-subtitles-manager
 pip install -e .
 ```
 
-## 🎮 Iniciando & Uso da Interface CLI (Command Line Engine)
-Terminada a instalação pip, você ganhou acesso em definitivo ao comando `slsm-server` rodando isoladamente em qualquer Powershell, Bash ou CMD do seu ambiente.
+## 🎮 Starting & Using the CLI (Command Line Engine)
+Once the pip installation is complete, you gain permanent access to the `slsm-server` command running isolated from any Powershell, Bash, or CMD inside your environment.
 
-Inicie com configurações base, chamando a porta universal `3001`:
+Start it with standard settings, exposing the universal `3001` port:
 ```bash
 slsm-server
 ```
 
-### Comandos de Customização Hacker
-Você é o dono da rede. Escolha as entradas personalizadas se desejar mapear servidores num NAS, SSD, ou Drive Externo customizado em qualquer porta do Roteador (ex: `:8080`)
+### Hacker Customization Commands
+You are the master of your network. Choose custom inputs if you want to map servers on a NAS, an external SSD drive, or proxy it to any Router Port (e.g., `:8080`):
 ```bash
-slsm-server --port 8080 --storage-path "D:\Minhas_Series\LegendasTV"
+slsm-server --port 8080 --storage-path "D:\My_Series\CustomSubs"
 ```
 
-## 📺 Integrando & Lincando seu Stremio à Base
-Simples! O server deve estar Online. E então, insira no link raiz o final com `/manifest.json`, veja:
-Abra seu Desktop App Oficial do Stremio e dispare o endereço de instalação interna.
-Ou cole este botão mágico no navegador e veja ser requisitado em milissegundos:
-> `stremio://localhost:3001/manifest.json` *(Substitua a porta local caso trocou no CLI!)*
+## 📺 Integrating & Linking your Stremio to the Base
+It is incredibly simple! Make sure your Server is Online. Then, point to the install link with `/manifest.json` at the end:
 
-![Screenshot App](https://i.imgur.com/qUa6aFn.png) *(Imagem de Exemplo Ilustrativa)*
+Open your Official Stremio Desktop App and paste the internal installation address. Or click this magic link directly via your browser to request installation in milliseconds:
+> `stremio://localhost:3001/manifest.json` *(Replace the local port if you modified it via CLI!)*
+
+![Screenshot App](https://i.imgur.com/qUa6aFn.png) *(Illustrative Example UI)*
 
 ---
 
-### Licença
-Software Livre mantido em contribuição ao ecossistema OpenSource com carinho. Use e Modifique à vontade! 🚀
+### License
+Free Software maintained as a contribution to the OpenSource ecosystem with care. Use and modify it at will! 🚀
