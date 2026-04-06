@@ -265,16 +265,17 @@ def create_app(storage_path):
 
 def main():
     parser = argparse.ArgumentParser(description="SLSM - Stremio Local Subtitles Manager")
+    parser.add_argument("--host", type=str, default="0.0.0.0", help="Host/IP local ou externo para parear o servidor")
     parser.add_argument("--port", type=int, default=3001, help="Porta para rodar o servidor web")
     parser.add_argument("--storage-path", type=str, default="./subtitles_data", help="Caminho recursivo raiz para gerenciar e armazenar the legendas")
     
     args = parser.parse_args()
     
-    logger.info(f"Iniciando SLSM Server na porta {args.port} | Pasta local storage principal fixada em: {os.path.abspath(args.storage_path)}")
+    logger.info(f"Iniciando SLSM Server no Host {args.host}:{args.port} | Pasta local storage principal fixada em: {os.path.abspath(args.storage_path)}")
     
     # Debug False for running as package daemon safely
     app = create_app(args.storage_path)
-    app.run(host='0.0.0.0', port=args.port, debug=False)
+    app.run(host=args.host, port=args.port, debug=False)
 
 if __name__ == '__main__':
     main()

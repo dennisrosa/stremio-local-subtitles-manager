@@ -12,7 +12,7 @@
         <div class="container d-flex justify-content-between">
             <span class="navbar-brand mb-0 h1" data-i18n="navBrand">🎬 SLS Manager Admin</span>
             <span class="navbar-text">
-                <a href="stremio://localhost:3001/manifest.json" class="btn btn-outline-info btn-sm text-decoration-none me-3" data-i18n="btnInstall">Instalar Add-on (stremio://)</a>
+                <a href="#" id="install-link" class="btn btn-outline-info btn-sm text-decoration-none me-3" data-i18n="btnInstall">Instalar Add-on (stremio://)</a>
                 <button class="btn btn-sm btn-outline-light" onclick="switchLang('pt')">🇧🇷 PT</button>
                 <button class="btn btn-sm btn-outline-light" onclick="switchLang('en')">🇺🇸 EN</button>
             </span>
@@ -384,6 +384,7 @@
 
         // Auto-Carregar
         document.addEventListener('DOMContentLoaded', () => {
+             document.getElementById('install-link').href = 'stremio://' + window.location.host + '/manifest.json';
              applyLang();
              fetchStaged();
              fetchDirectories();
