@@ -17,6 +17,30 @@ Meet the **Stremio Local Subtitles Manager (SLSM)**! This addon acts as a smart 
 - **🌐 Native Multi-Language Support (i18n):** The entire dashboard translates instantly (Client-Side Vanilla JS) between English (EN) and Brazilian Portuguese (PT-BR) seamlessly, with settings cached! We also have an auto-classification feature for subtitle flags (.eng, .per, .pt).
 - **🚀 Simplified Inline Upload:** A frictionless system that allows you to click and push files directly from your Windows Explorer to the target folder with robust backend validation!
 
+## 📸 Process Demo
+
+Take a look at the continuous process flowing seamlessly from the player to our system:
+
+1. **Stremio couldn't find subtitles (No tracks):**
+<br><img src="img/img01.png" width="800">
+
+2. **The App catches the request in the Staging Area:**
+<br><img src="img/img02.png" width="800">
+
+3. **Approved & Structure Generated (1 Click):**
+<br><img src="img/img03.png" width="800">
+
+4. **Inline Upload directly to the new media directory (Multi-Languages):**
+<br><img src="img/img04.png" width="800">
+
+5. **Physical Disk correctly structured by the Backend:**
+<br><img src="img/img05.png" width="800">
+
+6. **Subtitles flawlessly loaded and running on Stremio!**
+<br><img src="img/img06.png" width="800">
+
+---
+
 ## 📦 Easy Installation (CLI Daemon)
 
 SLSM was designed as a pip package module that registers a global executable straight to your Path.
@@ -47,8 +71,6 @@ It is incredibly simple! Make sure your Server is Online. Then, point to the ins
 
 Open your Official Stremio Desktop App and paste the internal installation address. Or click this magic link directly via your browser to request installation in milliseconds:
 > `stremio://localhost:3001/manifest.json` *(Replace the local port if you modified it via CLI!)*
-
-![Screenshot App](https://i.imgur.com/qUa6aFn.png) *(Illustrative Example UI)*
 
 ---
 
