@@ -23,15 +23,37 @@ def create_app(storage_path):
 
     @app.before_request
     def log_request_info():
-        logger.info(f"REQUEST RECEBIDO: {request.method} {request.url}")
+        # Responder imediatamente requisições OPTIONS (preflight CORS / Private Network Access)
+        if request.method == 'OPTIONS':
+            response = app.make_default_options_response()
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, DELETE, PUT'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+            response.headers['Access-Control-Allow-Private-Network'] = 'true'
+            return response
+        logger.info(f"REQUEST [{request.remote_addr}] -> {request.method} {request.url}")
+
+    @app.after_request
+    def add_cors_headers(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, DELETE, PUT'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+        response.headers['Access-Control-Allow-Private-Network'] = 'true'
+        return response
 
     @app.route('/')
+    @app.route('/configure')
     def index():
         import socket
+        lan_ip = "127.0.0.1"
         try:
-            lan_ip = socket.gethostbyname(socket.gethostname())
+            # Tenta descobrir o IP da interface de rede ativa fazendo um connect UDP 'fake'
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            lan_ip = s.getsockname()[0]
+            s.close()
         except:
-            lan_ip = "127.0.0.1"
+            pass
         return render_template('index.html', lan_ip=lan_ip)
 
     @app.route('/manifest.json')
@@ -40,17 +62,28 @@ def create_app(storage_path):
             "id": "com.local.subtitles.manager",
             "version": "1.0.0",
             "name": "SLSM - Stremio Local Subtitles Manager",
-            "description": "Intercepta demandas do Stremio e providencia autorização para pastas de legendas locais.",
+            "description": "Gerenciador remoto de legendas locais. Reinstale se o IP mudar.",
             "idPrefixes": ["tt"],
             "resources": ["subtitles"],
             "types": ["movie", "series"],
             "catalogs": [],
             "behaviorHints": {
                 "configurable": True,
-                "configurationRequired": True
-            }
+                "configurationRequired": False
+            },
+            "config": [
+                {
+                    "key": "backend_ip",
+                    "title": "IP do Servidor de Legendas",
+                    "type": "text",
+                    "required": True,
+                    "default": "localhost:3000"
+                }
+            ]
         }
-        return jsonify(manifest)
+        response = jsonify(manifest)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
     @app.route('/subtitles/<media_type>/<media_id>.json')
     @app.route('/subtitles/<media_type>/<media_id>/<extra>.json')

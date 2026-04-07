@@ -11,17 +11,31 @@
     <nav class="navbar navbar-dark bg-dark mb-4 shadow">
         <div class="container d-flex justify-content-between">
             <span class="navbar-brand mb-0 h1" data-i18n="navBrand">🎬 SLS Manager Admin</span>
-            <span class="navbar-text d-flex align-items-center">
-                <div class="input-group input-group-sm me-3" style="width: 200px;">
+                <div class="input-group input-group-sm me-3" style="width: 250px;">
                     <span class="input-group-text bg-dark text-light border-secondary">IP/Host</span>
                     <input type="text" id="custom-host" class="form-control bg-dark text-info border-secondary" value="{{ lan_ip }}:3001" oninput="updateInstallLink()">
+                    <button class="btn btn-outline-secondary" type="button" onclick="copyLink()" title="Copiar Link Stremio://">📋</button>
                 </div>
-                <a href="#" id="install-link" class="btn btn-outline-info btn-sm text-decoration-none me-3" data-i18n="btnInstall">Instalar Add-on (stremio://)</a>
+                <button class="btn btn-info btn-sm text-decoration-none me-3 fw-bold" onclick="window.location.href=document.getElementById('install-link-ref').value" data-i18n="btnInstall">Instalar no Stremio</button>
+                <input type="hidden" id="install-link-ref">
                 <button class="btn btn-sm btn-outline-light" onclick="switchLang('pt')">🇧🇷 PT</button>
                 <button class="btn btn-sm btn-outline-light" onclick="switchLang('en')">🇺🇸 EN</button>
             </span>
         </div>
     </nav>
+    
+    <div class="container text-center mb-3" id="network-alert" style="display:none;">
+        <div class="alert alert-warning py-2 small shadow-sm">
+            <strong data-i18n="netAlertTitle">📡 Instalação via Rede Local (IP)</strong>
+            <div class="mt-1" data-i18n="netAlertStep1">1. Abra o <strong>Stremio Desktop</strong> → Aba <strong>Add-ons</strong> → Campo de pesquisa no topo</div>
+            <div data-i18n="netAlertStep2">2. Cole a URL HTTP abaixo e pressione Enter:</div>
+            <div class="input-group input-group-sm mt-1 mx-auto" style="max-width: 500px;">
+                <input type="text" id="manual-url" class="form-control text-center bg-white fw-bold" readonly>
+                <button class="btn btn-primary" onclick="copyManual()" data-i18n="btnCopyUrl">📋 Copiar URL</button>
+            </div>
+            <div class="mt-2 text-danger fw-bold" data-i18n="netAlertFirewall">⚠️ Certifique-se de que o Firewall do Windows permite conexões de entrada na porta 3001/TCP!</div>
+        </div>
+    </div>
     
     <div class="container">
         <div class="card mb-4 shadow-sm border-0">
@@ -122,7 +136,12 @@
                 badgeSerie: "SÉRIE",
                 confirmDelDir: "Você vai EXCLUIR definitivamente essa pasta física de mídia da máquina junto com todas as legendas integradas. Confirmar?",
                 errDelDir: "Falha ao deletar. Permissão negada pelo Windows ou diretório não existe.",
-                colUpload: "Upload & Gestão"
+                colUpload: "Upload & Gestão",
+                netAlertTitle: "📡 Instalação via Rede Local (IP)",
+                netAlertStep1: '1. Abra o <strong>Stremio Desktop</strong> → Aba <strong>Add-ons</strong> → Campo de pesquisa no topo',
+                netAlertStep2: "2. Cole a URL HTTP abaixo e pressione Enter:",
+                btnCopyUrl: "📋 Copiar URL",
+                netAlertFirewall: "⚠️ Certifique-se de que o Firewall do Windows permite conexões de entrada na porta 3001/TCP!"
             },
             en: {
                 navBrand: "🎬 SLSM - Stremio Local Subtitles Manager",
@@ -165,7 +184,12 @@
                 badgeSerie: "SERIE",
                 confirmDelDir: "Permanently DELETE this physical media folder and all its subtitles from the hard-drive. Are you sure?",
                 errDelDir: "Failed to delete. Permission denied or folder missing.",
-                colUpload: "Upload & Manage"
+                colUpload: "Upload & Manage",
+                netAlertTitle: "📡 LAN Installation (IP Address)",
+                netAlertStep1: '1. Open <strong>Stremio Desktop</strong> → <strong>Add-ons</strong> tab → Search bar at the top',
+                netAlertStep2: "2. Paste the HTTP URL below and press Enter:",
+                btnCopyUrl: "📋 Copy URL",
+                netAlertFirewall: "⚠️ Make sure the Windows Firewall allows inbound connections on port 3001/TCP!"
             }
         };
 
@@ -387,8 +411,37 @@
         }
 
         function updateInstallLink() {
-            const hostVal = document.getElementById('custom-host').value.trim() || window.location.host;
-            document.getElementById('install-link').href = 'stremio://' + hostVal + '/manifest.json';
+            let hostVal = document.getElementById('custom-host').value.trim();
+            if(!hostVal) hostVal = window.location.host;
+            
+            if(hostVal && !hostVal.includes(':') && window.location.port) {
+                hostVal += ':' + window.location.port;
+            }
+
+            const manifestUri = hostVal + '/manifest.json';
+            document.getElementById('install-link-ref').value = 'stremio://' + manifestUri;
+            document.getElementById('manual-url').value = 'http://' + manifestUri;
+            
+            const alertBox = document.getElementById('network-alert');
+            if(!hostVal.startsWith('localhost') && !hostVal.startsWith('127.0.0.1')) {
+                alertBox.style.display = 'block';
+            } else {
+                alertBox.style.display = 'none';
+            }
+        }
+
+        function copyLink() {
+            const link = document.getElementById('install-link-ref').value;
+            navigator.clipboard.writeText(link).then(() => {
+                alert("Link stremio:// copiado!");
+            });
+        }
+
+        function copyManual() {
+            const link = document.getElementById('manual-url').value;
+            navigator.clipboard.writeText(link).then(() => {
+                alert("URL HTTP copiada! Cole no campo 'Addon URL' do Stremio.");
+            });
         }
 
         // Auto-Carregar
