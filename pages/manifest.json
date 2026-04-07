@@ -1,0 +1,30 @@
+{
+    "behaviorHints": {
+        "configurable": true,
+        "configurationRequired": false
+    },
+    "catalogs": [],
+    "config": [
+        {
+            "default": "localhost:3000",
+            "key": "backend_ip",
+            "required": true,
+            "title": "IP do Servidor de Legendas",
+            "type": "text"
+        }
+    ],
+    "description": "Gerenciador remoto de legendas locais. Reinstale se o IP mudar.",
+    "id": "com.local.subtitles.manager",
+    "idPrefixes": [
+        "tt"
+    ],
+    "name": "SLSM - Stremio Local Subtitles Manager",
+    "resources": [
+        "subtitles"
+    ],
+    "types": [
+        "movie",
+        "series"
+    ],
+    "version": "1.0.0"
+}
