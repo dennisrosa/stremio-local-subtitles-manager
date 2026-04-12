@@ -3,37 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SLSM - Stremio Local Subtitles Manager</title>
+    <title>Stremio Local Subtitles Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="bg-light">
     <!-- Navbar -->
     <nav class="navbar navbar-dark bg-dark mb-4 shadow">
         <div class="container d-flex justify-content-between">
-            <span class="navbar-brand mb-0 h1" data-i18n="navBrand">🎬 SLS Manager Admin</span>
-                <div class="input-group input-group-sm me-3" style="width: 250px;">
-                    <span class="input-group-text bg-dark text-light border-secondary">IP/Host</span>
-                    <input type="text" id="custom-host" class="form-control bg-dark text-info border-secondary" value="{{ lan_ip }}:3001" oninput="updateInstallLink()">
-                    <button class="btn btn-outline-secondary" type="button" onclick="copyLink()" title="Copiar Link Stremio://">📋</button>
-                </div>
-                <button class="btn btn-info btn-sm text-decoration-none me-3 fw-bold" onclick="window.location.href=document.getElementById('install-link-ref').value" data-i18n="btnInstall">Instalar no Stremio</button>
-                <input type="hidden" id="install-link-ref">
+            <span class="navbar-brand mb-0 h1" data-i18n="navBrand">🎬 Stremio Local Subtitles Manager</span>
+                <button class="btn btn-info btn-sm text-decoration-none me-3 fw-bold" data-bs-toggle="modal" data-bs-target="#installModal" data-i18n="btnInstall">Instalar Add-on</button>
                 <button class="btn btn-sm btn-outline-light" onclick="switchLang('pt')">🇧🇷 PT</button>
                 <button class="btn btn-sm btn-outline-light" onclick="switchLang('en')">🇺🇸 EN</button>
             </span>
         </div>
     </nav>
     
-    <div class="container text-center mb-3" id="network-alert" style="display:none;">
-        <div class="alert alert-warning py-2 small shadow-sm">
-            <strong data-i18n="netAlertTitle">📡 Instalação via Rede Local (IP)</strong>
-            <div class="mt-1" data-i18n="netAlertStep1">1. Abra o <strong>Stremio Desktop</strong> → Aba <strong>Add-ons</strong> → Campo de pesquisa no topo</div>
-            <div data-i18n="netAlertStep2">2. Cole a URL HTTP abaixo e pressione Enter:</div>
-            <div class="input-group input-group-sm mt-1 mx-auto" style="max-width: 500px;">
-                <input type="text" id="manual-url" class="form-control text-center bg-white fw-bold" readonly>
-                <button class="btn btn-primary" onclick="copyManual()" data-i18n="btnCopyUrl">📋 Copiar URL</button>
+    <div class="modal fade" id="installModal" tabindex="-1" aria-labelledby="installModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content text-dark">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="installModalLabel" data-i18n="installModalTitle">Instalação do Add-on</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-start">
+                    <p class="mb-4" data-i18n="installModalText">
+                        No <strong>Stremio Desktop</strong>, o plugin só funciona via <strong>localhost</strong> devido a restrições de segurança (HTTPS). 
+                        Já em <strong>TV Boxes ou outros dispositivos na rede</strong>, o IP local via HTTP funciona normalmente. 
+                        Para maior flexibilidade, recomendamos instalar ambas as versões.
+                    </p>
+                    
+                    <div class="mb-4">
+                        <h6 class="fw-bold" data-i18n="installLocalTitle">1. Instalação Local (Desktop)</h6>
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light" value="http://localhost:3001/manifest.json" readonly id="url-local">
+                            <button class="btn btn-primary" onclick="copyToClipboard('url-local')" data-i18n="btnCopyLink">Copiar Link</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h6 class="fw-bold" data-i18n="installRemoteTitle">2. Instalação Remota (TV Box / Rede)</h6>
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light" value="http://{{ lan_ip }}:3001/manifest.json" readonly id="url-remote">
+                            <button class="btn btn-primary" onclick="copyToClipboard('url-remote')" data-i18n="btnCopyLink">Copiar Link</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btnClose">Fechar</button>
+                </div>
             </div>
-            <div class="mt-2 text-danger fw-bold" data-i18n="netAlertFirewall">⚠️ Certifique-se de que o Firewall do Windows permite conexões de entrada na porta 3001/TCP!</div>
         </div>
     </div>
     
@@ -96,8 +115,8 @@
     <script>
         const i18n = {
             pt: {
-                navBrand: "🎬 SLSM - Stremio Local Subtitles Manager",
-                btnInstall: "Instalar Add-on (stremio://)",
+                navBrand: "🎬 Stremio Local Subtitles Manager",
+                btnInstall: "Instalar Add-on",
                 stagingTitle: "Área de Staging (Demandas Pendentes)",
                 btnRefresh: "🔄 Atualizar",
                 btnAuthAll: "📥 Aprovar Todas",
@@ -120,7 +139,7 @@
                 colTitle: "Título (Cinemeta API)",
                 colMediaRepo: "Mídia",
                 colSubs: "Legendas Hospedadas",
-                colUpload: "Upload Inline",
+                colUpload: "Upload & Gestão",
                 loadRepo: "Aguarde... Montando grade de diretórios.",
                 emptyRepo: "Nenhuma pasta autorizada/criada ainda no servidor local.",
                 imdbLocating: "⌛ Localizando IMDB...",
@@ -136,16 +155,16 @@
                 badgeSerie: "SÉRIE",
                 confirmDelDir: "Você vai EXCLUIR definitivamente essa pasta física de mídia da máquina junto com todas as legendas integradas. Confirmar?",
                 errDelDir: "Falha ao deletar. Permissão negada pelo Windows ou diretório não existe.",
-                colUpload: "Upload & Gestão",
-                netAlertTitle: "📡 Instalação via Rede Local (IP)",
-                netAlertStep1: '1. Abra o <strong>Stremio Desktop</strong> → Aba <strong>Add-ons</strong> → Campo de pesquisa no topo',
-                netAlertStep2: "2. Cole a URL HTTP abaixo e pressione Enter:",
-                btnCopyUrl: "📋 Copiar URL",
-                netAlertFirewall: "⚠️ Certifique-se de que o Firewall do Windows permite conexões de entrada na porta 3001/TCP!"
+                installModalTitle: "Instalação do Add-on",
+                installModalText: "No <b>Stremio Desktop</b>, o plugin só funciona via <b>localhost</b> devido a restrições de segurança (HTTPS). Já em <b>TV Boxes ou dispositivos móveis</b>, o IP local via HTTP funciona normalmente. Para melhor experiência, recomendamos instalar ambas as versões.",
+                installLocalTitle: "1. Instalação Local (Desktop)",
+                installRemoteTitle: "2. Instalação Remota (TV Box / Rede)",
+                btnCopyLink: "Copiar Link",
+                btnClose: "Fechar"
             },
             en: {
-                navBrand: "🎬 SLSM - Stremio Local Subtitles Manager",
-                btnInstall: "Install Add-on (stremio://)",
+                navBrand: "🎬 Stremio Local Subtitles Manager",
+                btnInstall: "Install Add-on",
                 stagingTitle: "Staging Area (Pending Requests)",
                 btnRefresh: "🔄 Refresh",
                 btnAuthAll: "📥 Approve All",
@@ -168,7 +187,7 @@
                 colTitle: "Title (Cinemeta API)",
                 colMediaRepo: "Media",
                 colSubs: "Hosted Subtitles",
-                colUpload: "Inline Upload",
+                colUpload: "Upload & Manage",
                 loadRepo: "Please wait... Building directory grid.",
                 emptyRepo: "No authorized/created local folders yet.",
                 imdbLocating: "⌛ Locating IMDB...",
@@ -184,12 +203,12 @@
                 badgeSerie: "SERIE",
                 confirmDelDir: "Permanently DELETE this physical media folder and all its subtitles from the hard-drive. Are you sure?",
                 errDelDir: "Failed to delete. Permission denied or folder missing.",
-                colUpload: "Upload & Manage",
-                netAlertTitle: "📡 LAN Installation (IP Address)",
-                netAlertStep1: '1. Open <strong>Stremio Desktop</strong> → <strong>Add-ons</strong> tab → Search bar at the top',
-                netAlertStep2: "2. Paste the HTTP URL below and press Enter:",
-                btnCopyUrl: "📋 Copy URL",
-                netAlertFirewall: "⚠️ Make sure the Windows Firewall allows inbound connections on port 3001/TCP!"
+                installModalTitle: "Add-on Installation",
+                installModalText: "On <b>Stremio Desktop</b>, the plugin only works via <b>localhost</b> due to security restrictions (HTTPS). In <b>TV Boxes or mobile devices</b>, the local IP via HTTP works normally. For the best experience, we recommend installing both versions.",
+                installLocalTitle: "1. Local Installation (Desktop)",
+                installRemoteTitle: "2. Remote Installation (TV Box / Network)",
+                btnCopyLink: "Copy Link",
+                btnClose: "Close"
             }
         };
 
@@ -410,47 +429,35 @@
             }
         }
 
-        function updateInstallLink() {
-            let hostVal = document.getElementById('custom-host').value.trim();
-            if(!hostVal) hostVal = window.location.host;
-            
-            if(hostVal && !hostVal.includes(':') && window.location.port) {
-                hostVal += ':' + window.location.port;
-            }
-
-            const manifestUri = hostVal + '/manifest.json';
-            document.getElementById('install-link-ref').value = 'stremio://' + manifestUri;
-            document.getElementById('manual-url').value = 'http://' + manifestUri;
-            
-            const alertBox = document.getElementById('network-alert');
-            if(!hostVal.startsWith('localhost') && !hostVal.startsWith('127.0.0.1')) {
-                alertBox.style.display = 'block';
-            } else {
-                alertBox.style.display = 'none';
-            }
-        }
-
-        function copyLink() {
-            const link = document.getElementById('install-link-ref').value;
-            navigator.clipboard.writeText(link).then(() => {
-                alert("Link stremio:// copiado!");
-            });
-        }
-
-        function copyManual() {
-            const link = document.getElementById('manual-url').value;
-            navigator.clipboard.writeText(link).then(() => {
-                alert("URL HTTP copiada! Cole no campo 'Addon URL' do Stremio.");
+        function copyToClipboard(elementId) {
+            const input = document.getElementById(elementId);
+            navigator.clipboard.writeText(input.value).then(() => {
+                alert(t('btnCopyLink') + "!");
             });
         }
 
         // Auto-Carregar
-        document.addEventListener('DOMContentLoaded', () => {
-             updateInstallLink();
-             applyLang();
-             fetchStaged();
-             fetchDirectories();
-        });
+        async function init() {
+             if (window.initDone) return;
+             window.initDone = true;
+             try {
+                 applyLang();
+                 fetchStaged();
+                 fetchDirectories();
+             } catch (e) {
+                 console.error("Initialization error:", e);
+             }
+        }
+
+        // Multiple triggers to ensure execution
+        document.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('load', init);
+        // If readyState is already advanced, run now
+        if (document.readyState === 'interactive' || document.readyState === 'complete') {
+            init();
+        }
+        // Force attempt after a short delay just in case
+        setTimeout(init, 500);
     </script>
 </body>
 </html>

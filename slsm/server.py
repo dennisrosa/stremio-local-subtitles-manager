@@ -61,7 +61,7 @@ def create_app(storage_path):
         manifest = {
             "id": "com.local.subtitles.manager",
             "version": "1.0.0",
-            "name": "SLSM - Stremio Local Subtitles Manager",
+            "name": "Stremio Local Subtitles Manager",
             "description": "Gerenciador remoto de legendas locais. Reinstale se o IP mudar.",
             "idPrefixes": ["tt"],
             "resources": ["subtitles"],
@@ -318,6 +318,7 @@ def main():
     # Debug False for running as package daemon safely
     app = create_app(args.storage_path)
     app.run(host=args.host, port=args.port, debug=False)
+    #app.run(ssl_context='adhoc', host=args.host, port=args.port, debug=False)
 
 if __name__ == '__main__':
     main()

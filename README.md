@@ -1,4 +1,4 @@
-<h1 align="center">🎬 SLSM - Stremio Local Subtitles Manager</h1>
+<h1 align="center">🎬 Stremio Local Subtitles Manager</h1>
 
 <p align="center">
   <em>A Python (Flask) framework for passive management and massive submission of local subtitles to your Stremio player, controlled through a robust, multi-language Single Page Application (SPA).</em>
@@ -9,7 +9,7 @@
 ## ⚡ What does SLSM solve?
 Have you ever been frustrated by having to download subtitles manually because Stremio couldn't find them on official external sources? Do you hate the bureaucracy of creating all those folders and naming files exactly as required by local Add-ons in your `C:/` or `D:/` drives?
 
-Meet the **Stremio Local Subtitles Manager (SLSM)**! This addon acts as a smart local listener. In the initial request, your Stremio will look for a movie or episode subtitle. If it doesn't have it locally, the App saves that "demand" in memory (Staging Area). You - the Sysadmin of your machine - can then access the Web UI from any browser, and with **just 1 Click** ("Approve All"), the entire empty physical logic and hierarchical folder structures (Movie ID / Seasons / Episodes) are automatically generated and rooted in your hard drive. After that, just upload the files directly using a beautiful UI grid that fetches movie data from the Cinemeta API!
+Meet the **Stremio Local Subtitles Manager**! This addon acts as a smart local listener. In the initial request, your Stremio will look for a movie or episode subtitle. If it doesn't have it locally, the App saves that "demand" in memory (Staging Area). You - the Sysadmin of your machine - can then access the Web UI from any browser, and with **just 1 Click** ("Approve All"), the entire empty physical logic and hierarchical folder structures (Movie ID / Seasons / Episodes) are automatically generated and rooted in your hard drive. After that, just upload the files directly using a beautiful UI grid that fetches movie data from the Cinemeta API!
 
 ## ✨ Features
 - **🎯 Smart Auto-Staging:** Catches organic subtitle errors during your natural Stremio/TV usage and documents these requests for your review and approval.
@@ -43,7 +43,7 @@ Take a look at the continuous process flowing seamlessly from the player to our 
 
 ## 📦 Easy Installation (CLI Daemon)
 
-SLSM was designed as a pip package module that registers a global executable straight to your Path.
+The project was designed as a pip package module that registers a global executable straight to your Path.
 
 Install it directly from the Git source:
 ```bash
@@ -67,10 +67,11 @@ slsm-server --port 8080 --storage-path "D:\My_Series\CustomSubs"
 ```
 
 ## 📺 Integrating & Linking your Stremio to the Base
-It is incredibly simple! Make sure your Server is Online. Then, point to the install link with `/manifest.json` at the end:
+It is incredibly simple! Make sure your Server is Online. Then, access the landing page (usually `http://localhost:3001`) and click on **Install Add-on**.
 
-Open your Official Stremio Desktop App and paste the internal installation address. Or click this magic link directly via your browser to request installation in milliseconds:
-> `stremio://localhost:3001/manifest.json` *(Replace the local port if you modified it via CLI!)*
+A popup will guide you to choose between:
+- **Local Installation**: Mandatory for Stremio Desktop on the same machine.
+- **Remote Installation**: For TV Boxes, Mobile devices, or other computers on the same network.
 
 ---
 

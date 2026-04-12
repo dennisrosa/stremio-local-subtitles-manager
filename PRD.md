@@ -1,9 +1,9 @@
 # Product Requirements Document (PRD) – Versão 3.0
-**SLSM - Stremio Local Subtitles Manager – Python + Flask**
+**Stremio Local Subtitles Manager – Python + Flask**
 *(Com Staging Automático via Stremio, Criação Autorizada de Pastas e Upload Posterior)*
 
 ## 1. Executive Summary
-**Product Name:** SLSM - Stremio Local Subtitles Manager – com controle de estrutura e permissão
+**Product Name:** Stremio Local Subtitles Manager – com controle de estrutura e permissão
 
 **Goal:**
 Desenvolver um servidor web local (Python/Flask) que intercepta as chamadas de busca de legendas do Stremio. Na requisição, se a legenda já existir salva no disco, ela é devolvida. Se não existir, a API **não aciona nenhum file upload** naquele momento. Em vez disso, ela registra essa busca de usuário (identificando filme/série, temporada, episódio e idioma) em uma área de "staging" em memória. O mantenedor do servidor (usuário/admin) pode então acessar uma interface separada, **autorizar** a criação das estruturas em pasta de toda essa demanda orgânica e, somente após a respectiva infraestrutura em disco estar devidamente criada, realizar através da aplicação web o **upload** da legenda em si, que já cairá no local autorizado e organizado previamente. 
@@ -78,6 +78,7 @@ Usuários avançados e administradores de repositório que desejam captar automa
   * **Card Board 1 (Demandas Pendentes):** Fila robusta consumindo requisições do Stremio para autorização em massa ou exclusão global.
   * **Mega Grid Card (Repositório / File Input):** Uma tabela mapeada integrando metadados e Covers da Cinemeta API, apresentando Input Upload Inline limpo e *Badges* flag tags das legendas hospedadas. A listagem filtra eficientemente pastas raízes de Séries prestando foco às folhas de episódio.
   * **Switcher I18n Locale:** O Navbar do Header suporta toggles "PT/EN" regidos por dicionário JSON via Client-Side JS, permitindo renderização multilingue sem recarregar e que adquire persistência guardando dados do player no LocalStorage. 
+  * **Fluxo de Instalação:** O botão "Instalar Add-on" abre um modal educativo com as URLs e gatilhos `stremio://` tanto para `localhost` (Desktop) quanto para o IP da Rede local (TV Boxes), facilitando a configuração em múltiplos dispositivos.
 
 ## 5. Requisitos Não Funcionais
 
